@@ -1,8 +1,7 @@
 import streamlit as st
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.vectorstores import FAISS
 from langchain.chains import ConversationalRetrievalChain
-from langchain.llms import OpenAI
 from langchain.memory import ConversationBufferMemory
 import os
 
@@ -23,13 +22,23 @@ def load_vector_db(index_name, openai_api_key):
         return None
 
 def create_qa_chain(vector_db, openai_api_key):
-    llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo-0125", temperature=1, openai_api_key=openai_api_key, max_tokens=4096)
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, output_key="answer")
+    
+    # top_k를 5로 설정
+    retriever = vector_db.as_retriever(search_kwargs={"k": 5})
+    
     return ConversationalRetrievalChain.from_llm(
         llm=llm,
-        retriever=vector_db.as_retriever(),
-        memory=memory
+        retriever=retriever,
+        memory=memory,
+        return_source_documents=True
     )
+
+def display_source_info(source):
+    st.markdown("#### 출처 상세 정보")
+    st.text_area("내용", source.page_content, height=150)
+    st.json(source.metadata)
 
 def main():
     st.title("FAISS 기반 QnA 시스템")
@@ -73,6 +82,13 @@ def main():
                 result = qa_chain({"question": prompt})
                 response = result['answer']
                 st.markdown(response)
+
+                # 출처 표시 (expander 사용)
+                if 'source_documents' in result:
+                    st.markdown("### 출처")
+                    for i, doc in enumerate(result['source_documents']):
+                        with st.expander(f"출처 {i+1}"):
+                            display_source_info(doc)
         
         # Add assistant response to chat history
         st.session_state.messages.append({"role": "assistant", "content": response})
