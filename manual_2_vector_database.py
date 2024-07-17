@@ -27,8 +27,8 @@ def load_and_split_pdf(pdf_file):
 
     # 텍스트 분할 설정
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
+        chunk_size=4096,
+        chunk_overlap=512,
         length_function=len,
         is_separator_regex=False,
     )
