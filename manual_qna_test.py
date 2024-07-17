@@ -41,7 +41,7 @@ def display_source_info(source):
     st.json(source.metadata)
 
 def main():
-    st.title("FAISS 기반 QnA 시스템")
+    st.title("건설교통부 시설물유지관리지침 QnA 시스템")
 
     st.write(f"현재 작업 디렉토리: {os.getcwd()}")
 
