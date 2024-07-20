@@ -33,6 +33,11 @@ def load_and_split_pdf(pdf_file):
         is_separator_regex=False,
     )
     chunks = text_splitter.split_documents(documents)
+    
+    # 메타데이터 수정: source를 PDF 파일 이름으로 변경
+    for chunk in chunks:
+        chunk.metadata['source'] = pdf_file.name
+
     return chunks
 
 def create_vector_db(chunks, openai_api_key):

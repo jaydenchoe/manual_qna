@@ -22,7 +22,7 @@ def load_vector_db(index_name, openai_api_key):
         return None
 
 def create_qa_chain(vector_db, openai_api_key):
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo-0125", temperature=1, openai_api_key=openai_api_key, max_tokens=4096)
+    llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=1, openai_api_key=openai_api_key, max_tokens=4096)
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, output_key="answer")
     
     # top_k를 5로 설정
